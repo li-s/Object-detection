@@ -67,7 +67,7 @@ for i, img in enumerate(images):
     det_ymax = results[i][:, 5]
 
     # Get detections with confidence higher than 0.6.
-    top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.2]
+    top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.6]
 
     top_conf = det_conf[top_indices]
     top_label_indices = det_label[top_indices].tolist()
