@@ -46,7 +46,7 @@ img = image.load_img(img_path, target_size=(300, 300))
 img = image.img_to_array(img)
 images.append(imread(img_path))
 inputs.append(img.copy())
-img_path = '../data/duck.jpg'
+img_path = '../data/000005.jpg'
 img = image.load_img(img_path, target_size=(300, 300))
 img = image.img_to_array(img)
 images.append(imread(img_path))

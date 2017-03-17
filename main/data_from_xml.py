@@ -81,7 +81,6 @@ class XML_preprocessor(object):
             one_hot_vector[19] = 1
         else:
             print('unknown label: %s' %name)
-
         return one_hot_vector
 
 if __name__ == '__main__':
