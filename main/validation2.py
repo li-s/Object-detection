@@ -104,39 +104,7 @@ def process_images(results):
     return image_list
 
 def checker(image_list, img):
-    for i in range(len(image_list)):
-        for j in range(image_list[i][0].shape[0]):
-            if j < 1:
-                xmin = int(round(image_list[i][2][j] * img.shape[1]))
-                ymin = int(round(image_list[i][3][j] * img.shape[0]))
-                xmax = int(round(image_list[i][4][j] * img.shape[1]))
-                ymax = int(round(image_list[i][5][j] * img.shape[0]))
-                print(xmin, ymin, xmax, ymax)
-                print(image_list[i][2][j], image_list[i][3][j], image_list[i][4][j], image_list[i][5][j])
-                input('1')
-
-    with open('../data/VOC2007.pkl', 'rb') as read:
-        x = pickle.load(read)
-        sorted_x = sorted(x.items(), key=operator.itemgetter(0))
-        number_correct = 0
-        total = 0
-        extras = 0
-        a = 0
-        for i, j in enumerate(sorted_x):
-            if a < 3:
-                print(j[1])
-                list_of_one_hot = [[k for k, int1 in enumerate(a_list[3:]) if int1 == 1.0] for a_list in j[1]]
-                list_of_one_hot = list(itertools.chain.from_iterable(list_of_one_hot))
-                # This counts how many labels there are in total
-                total += len(list_of_one_hot)
-                # This counts how many labels are correct
-                similarity = numDups(image_list[i][1], list_of_one_hot)
-                number_correct +=similarity
-                # This counts how many extra labels are identified
-                extras += len(image_list[1][i])
-                a+=1
-
-    return number_correct, total, extras
+    pascal_VOC.parse_rec()
 
 if __name__ == '__main__':
     model, bbox_util = load_model()

@@ -6,6 +6,8 @@ For introduction, explanation, and readings on object detection, go to Image-rec
 
 ## Getting started
 
+### Prerequisites
+
 ## API reference
 + [ssd keras](https://github.com/rykov8/ssd_keras)
 
