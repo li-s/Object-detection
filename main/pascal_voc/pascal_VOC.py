@@ -189,3 +189,6 @@ def voc_eval(detpath,
     ap = voc_ap(rec, prec, use_07_metric)
 
     return rec, prec, ap
+
+if __name__ == '__main__':
+    voc_eval(detpath, annopath, imagesetfile, classname, cachedir)
