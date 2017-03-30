@@ -31,22 +31,22 @@ NUM_CLASSES = len(voc_classes) + 1
 
 input_shape=(300, 300, 3)
 model = SSD300(input_shape, num_classes=NUM_CLASSES)
-model.load_weights('../data/weights_SSD300.hdf5', by_name=True)
+model.load_weights('../../data/weights_SSD300.hdf5', by_name=True)
 bbox_util = BBoxUtility(NUM_CLASSES)
 
 inputs = []
 images = []
-img_path = '../data/fish-bike.jpg'
+img_path = '../../data/fish-bike.jpg'
 img = image.load_img(img_path, target_size=(300, 300))
 img = image.img_to_array(img)
 images.append(imread(img_path))
 inputs.append(img.copy())
-img_path = '../data/cat.jpg'
+img_path = '../../data/cat.jpg'
 img = image.load_img(img_path, target_size=(300, 300))
 img = image.img_to_array(img)
 images.append(imread(img_path))
 inputs.append(img.copy())
-img_path = '../data/000005.jpg'
+img_path = '../../data/000005.jpg'
 img = image.load_img(img_path, target_size=(300, 300))
 img = image.img_to_array(img)
 images.append(imread(img_path))

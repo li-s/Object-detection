@@ -191,4 +191,4 @@ def voc_eval(detpath,
     return rec, prec, ap
 
 if __name__ == '__main__':
-    voc_eval(detpath, annopath, imagesetfile, classname, cachedir)
+    voc_eval(detpath, annopath, '../../data/VOC2007/ImageSets/Layout/val.txt', classname, cachedir)

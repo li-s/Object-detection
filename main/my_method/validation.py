@@ -55,14 +55,14 @@ def validates_images(model, bbox_util):
     inputs = []
     images = []
     files = []
-    for filename in os.listdir('../data/VOC2007/JPEGImages'):
+    for filename in os.listdir('../../data/VOC2007/JPEGImages'):
         if filename.endswith('.jpg'):
             files.append(filename)
 
     b =0
     for filename in sorted(files):
         if b < 3:
-            img_path = '../data/VOC2007/JPEGImages/' + filename
+            img_path = '../../data/VOC2007/JPEGImages/' + filename
             img = image.load_img(img_path, target_size=(300, 300))
             img = image.img_to_array(img)
             images.append(imread(img_path))
