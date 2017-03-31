@@ -45,7 +45,7 @@ def get_ground_truth(image_file):
         lines = f.readlines()
     imagenames = [x.strip() for x in lines]
 
-    # Gets images files to validate on
+    # Gets name of each image file to validate on
     images = []
     for image in imagenames:
         images.append(image + '.txt')
@@ -87,23 +87,24 @@ def load_model():
 
     return model, bbox_util
 
-def validates_images(model, bbox_util):
+def validates_images(image_file, model, bbox_util):
     inputs = []
     images = []
-    files = []
-    for filename in os.listdir('../../data/VOC2007/JPEGImages'):
-        if filename.endswith('.jpg'):
-            files.append(filename)
+    with open(image_file, 'r') as f:
+        lines = f.readlines()
+    imagenames = [x.strip() for x in lines]
 
-    b =0
+    # Gets name of each image file to validate on
+    images = []
+    for image in imagenames:
+        images.append(image + '.txt')
+
     for filename in sorted(files):
-        if b < 3:
-            img_path = '../../data/VOC2007/JPEGImages/' + filename
-            img = image.load_img(img_path, target_size=(300, 300))
-            img = image.img_to_array(img)
-            images.append(imread(img_path))
-            inputs.append(img.copy())
-            b += 1
+        img_path = '../../data/VOC2007/JPEGImages/' + filename
+        img = image.load_img(img_path, target_size=(300, 300))
+        img = image.img_to_array(img)
+        images.append(imread(img_path))
+        inputs.append(img.copy())
 
     inputs = preprocess_input(np.array(inputs))
     preds = model.predict(inputs, batch_size=1, verbose=1)
