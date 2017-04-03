@@ -18,27 +18,27 @@ def parse_rec(filename):
     return objects
 
 def bb_intersection_over_union(boxA, boxB):
-	# determine the (x, y)-coordinates of the intersection rectangle
-	xA = max(boxA[0], boxB[0])
-	yA = max(boxA[1], boxB[1])
-	xB = min(boxA[2], boxB[2])
-	yB = min(boxA[3], boxB[3])
+    # determine the (x, y)-coordinates of the intersection rectangle
+    xA = max(boxA[0], boxB[0])
+    yA = max(boxA[1], boxB[1])
+    xB = min(boxA[2], boxB[2])
+    yB = min(boxA[3], boxB[3])
 
-	# compute the area of intersection rectangle
-	interArea = (xB - xA + 1) * (yB - yA + 1)
+    # compute the area of intersection rectangle
+    interArea = (xB - xA + 1) * (yB - yA + 1)
 
-	# compute the area of both the prediction and ground-truth
-	# rectangles
-	boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
-	boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
+    # compute the area of both the prediction and ground-truth
+    # rectangles
+    boxAArea = (boxA[2] - boxA[0] + 1) * (boxA[3] - boxA[1] + 1)
+    boxBArea = (boxB[2] - boxB[0] + 1) * (boxB[3] - boxB[1] + 1)
 
-	# compute the intersection over union by taking the intersection
-	# area and dividing it by the sum of prediction + ground-truth
-	# areas - the interesection area
-	iou = interArea / float(boxAArea + boxBArea - interArea)
+    # compute the intersection over union by taking the intersection
+    # area and dividing it by the sum of prediction + ground-truth
+    # areas - the interesection area
+    iou = interArea / float(boxAArea + boxBArea - interArea)
 
-	# return the intersection over union value
-	return iou
+    # return the intersection over union value
+    return iou
 
 def get_ground_truth(image_file):
     with open(image_file, 'r') as f:
@@ -47,17 +47,19 @@ def get_ground_truth(image_file):
 
     # Gets name of each image file to validate on
     images = []
-    for image in imagenames:
-        images.append(image + '.txt')
+    for img in imagenames:
+        images.append(img + '.txt')
 
-    # Gets ground truth boxes
+    # Gets ground truth boxes with independent list for each image.
     ground_truth = []
-    for image in imagenames:
-        filename = '../../data/VOC2007/Annotations/' + image + '.xml'
+    for img in imagenames:
+        filename = '../../data/VOC2007/Annotations/' + img + '.xml'
+        file_temp = []
         objects = parse_rec(filename)
         for i in objects:
-            ground_truth.append(i['name'])
-            ground_truth.append(i['bbox'])
+            file_temp.append(i['name'])
+            file_temp.append(i['bbox'])
+        ground_truth.append(file_temp)
 
     ground_truth = tuple(ground_truth)
 
@@ -87,19 +89,10 @@ def load_model():
 
     return model, bbox_util
 
-def validates_images(image_file, model, bbox_util):
+def validates_images(images, model, bbox_util):
     inputs = []
-    images = []
-    with open(image_file, 'r') as f:
-        lines = f.readlines()
-    imagenames = [x.strip() for x in lines]
 
-    # Gets name of each image file to validate on
-    images = []
-    for image in imagenames:
-        images.append(image + '.txt')
-
-    for filename in sorted(files):
+    for filename in images:
         img_path = '../../data/VOC2007/JPEGImages/' + filename
         img = image.load_img(img_path, target_size=(300, 300))
         img = image.img_to_array(img)
@@ -142,21 +135,23 @@ def process_images(results):
 
 
 if __name__ == '__main__':
+    # Get data
     images, ground_truth = get_ground_truth('../../data/VOC2007/ImageSets/Layout/val.txt')
 
     # Formats data
     truth = []
     gt = []
-    for i, j in enumerate(ground_truth):
-        if i%2 == 0:
-            truth.append(j)
-        else:
-            gt.append(j)
+    for a in ground_truth:
+        for i, j in enumerate a:
+            if i%2 == 0:
+                truth.append(j)
+            else:
+                gt.append(j)
 
-    # Load model
+    # Load model and performs predictions
     model, bbox_util = load_model()
-    # Performs predicitons
-    results, img = validates_images(model, bbox_util)
+    results, img = validates_images(images, model, bbox_util)
+
     # Removes unecessary predicitons
     image_list = process_images(results)
 
@@ -173,7 +168,9 @@ if __name__ == '__main__':
 
 
 
-
+'''
+Keeping for reference
+'''
 
 # from collections import namedtuple
 #
