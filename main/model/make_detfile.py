@@ -17,7 +17,7 @@ def file_maker(predictions, imagenames):
                    'Sheep', 'Sofa', 'Train', 'Tvmonitor']
 
     for i, classes in enumerate(voc_classes):
-        with open('../../data/predictions/{}.txt'.format(classes), 'w') as w:
+        with open('../../data/predictions/{}.txt'.format(classes.lower()), 'w') as w:
             for j, prediction in enumerate(predictions):
                 for k, l in enumerate(prediction):
                     if prediction[k][0] == classes:

@@ -199,6 +199,12 @@ if __name__ == '__main__':
                    'Sheep', 'Sofa', 'Train', 'Tvmonitor']
 
     # for i in splitlines:
+    aps = 0
     for classes in voc_classes:
-        rec, prec, ap = voc_eval('../../data/predictions/{}.txt', '../../data/VOC2007/Annotations/{}.xml', '../../data/VOC2007/ImageSets/Layout/val.txt', classes, 'cache')
-        print(rec, prec, ap)
+        rec, prec, ap = voc_eval('../../data/predictions/{}.txt',
+                '../../data/VOC2007/Annotations/{}.xml',
+                '../../data/VOC2007/ImageSets/Layout/val.txt', classes.lower(), 'cache')
+        aps += ap
+        aps /= 2
+        print(classes, ap)
+    print(aps)
