@@ -198,4 +198,7 @@ if __name__ == '__main__':
                    'Dog', 'Horse','Motorbike', 'Person', 'Pottedplant',
                    'Sheep', 'Sofa', 'Train', 'Tvmonitor']
 
-    voc_eval('../../data/usethis.txt', '../../data/VOC2007/Annotations/000005.xml', '../../data/VOC2007/ImageSets/Layout/val.txt', 'chair', 'cache')
+    # for i in splitlines:
+    for classes in voc_classes:
+        rec, prec, ap = voc_eval('../../data/predictions/{}.txt', '../../data/VOC2007/Annotations/{}.xml', '../../data/VOC2007/ImageSets/Layout/val.txt', classes, 'cache')
+        print(rec, prec, ap)

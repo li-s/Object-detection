@@ -231,6 +231,8 @@ if __name__ == '__main__':
 
     # Get bounding box and label of predictions
     predictions = process_images(images, results, voc_classes)
+    print(predictions)
+    input('1')
     # Works
 
     ap_iou_preprocess(classname, ground_truth, predictions)
