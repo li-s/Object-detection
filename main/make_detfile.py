@@ -4,7 +4,7 @@ def file_read():
     with open('cache/predictions.pkl', 'rb') as read:
         predictions = pickle.load(read)
 
-    with open('../../data/VOC2007/ImageSets/Layout/val.txt', 'r') as read:
+    with open('../data/VOC2007/ImageSets/Layout/val.txt', 'r') as read:
         lines = read.readlines()
     splitlines = [x.strip().split(' ') for x in lines]
 
@@ -17,7 +17,7 @@ def file_maker(predictions, imagenames):
                    'Sheep', 'Sofa', 'Train', 'Tvmonitor']
 
     for i, classes in enumerate(voc_classes):
-        with open('../../data/predictions/{}.txt'.format(classes.lower()), 'w') as w:
+        with open('../data/predictions/{}.txt'.format(classes.lower()), 'w') as w:
             for j, prediction in enumerate(predictions):
                 for k, l in enumerate(prediction):
                     if prediction[k][0] == classes:

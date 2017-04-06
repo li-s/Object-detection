@@ -201,10 +201,10 @@ if __name__ == '__main__':
     # for i in splitlines:
     aps = 0
     for classes in voc_classes:
-        rec, prec, ap = voc_eval('../../data/predictions/{}.txt',
-                '../../data/VOC2007/Annotations/{}.xml',
-                '../../data/VOC2007/ImageSets/Layout/val.txt', classes.lower(), 'cache')
+        rec, prec, ap = voc_eval('../data/predictions/{}.txt',
+                '../data/VOC2007/Annotations/{}.xml',
+                '../data/VOC2007/ImageSets/Layout/val.txt', classes.lower(), 'cache')
         aps += ap
         aps /= 2
         print(classes, ap)
-    print(aps)
+    print('Mean average precision: {}'.format(aps))
