@@ -35,14 +35,13 @@ def get_ground_truth(image_file):
     # Gets ground truth boxes with independent list for each image.
     ground_truth = []
     for img in imagenames:
-        file_temp = []
         filename = '../../data/VOC2007/Annotations/' + img + '.xml'
         objects = parse_rec(filename)
         for i in objects:
+            file_temp = []
             file_temp.append(i['name'])
             file_temp.append(i['bbox'])
-
-        ground_truth.append(file_temp)
+            ground_truth.append(file_temp)
 
     ground_truth = tuple(ground_truth)
 
@@ -90,7 +89,7 @@ def validates_images(imagenames, model, bbox_util):
     return images, results
 
 def process_images(images, results, voc_classes):
-    image_list = []
+    predictions = []
     for i, img in enumerate(images):
         # Parse the outputs.
         det_label = results[i][:, 0]
@@ -101,7 +100,7 @@ def process_images(images, results, voc_classes):
         det_ymax = results[i][:, 5]
 
         # Get detections with confidence higher than 0.4, as it gives the highest % accuracy of labels.
-        top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.5]
+        top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.4]
 
         top_conf = det_conf[top_indices]
         top_label_indices = det_label[top_indices].tolist()
@@ -110,22 +109,27 @@ def process_images(images, results, voc_classes):
         top_xmax = det_xmax[top_indices]
         top_ymax = det_ymax[top_indices]
 
-        a_list = []
+        temp_predictions = []
         for i in range(top_conf.shape[0]):
             xmin = int(round(top_xmin[i] * img.shape[1]))
             ymin = int(round(top_ymin[i] * img.shape[0]))
             xmax = int(round(top_xmax[i] * img.shape[1]))
             ymax = int(round(top_ymax[i] * img.shape[0]))
+            score = top_conf[i]
             label = int(top_label_indices[i])
             label_name = voc_classes[label - 1]
 
-            a_list.append([label_name, xmin, ymin, xmax, ymax])
+            temp_predictions.append([label_name, score, xmin, ymin, xmax, ymax])
+        predictions.append(temp_predictions)
 
-        image_list.append(a_list)
-
-    return predict_label, predict_box
+    return predictions
 
 def bb_intersection_over_union(boxA, boxB):
+    '''
+    boxA/B : ground truth bounding box and validation box in any order (a bounding box)
+    '''
+
+    print('boxA: {} boxB: {}\nboxA[i]: {} boxB[i]: {}'.format(boxA, boxB, boxA[i], boxB[i]))
     # determine the (x, y)-coordinates of the intersection rectangle
     xA = max(boxA[0], boxB[0])
     yA = max(boxA[1], boxB[1])
@@ -143,16 +147,12 @@ def bb_intersection_over_union(boxA, boxB):
     # compute the intersection over union by taking the intersection
     # area and dividing it by the sum of prediction + ground-truth
     # areas - the interesection area
-    iou = interArea / float(boxAArea + boxBArea - interArea)
+    iou = float(interArea / float(boxAArea + boxBArea - interArea))
 
     # return the intersection over union value
     return iou
 
-if __name__ == '__main__':
-    # Get data
-    # imagenames = file name of images to validate on
-    imagenames, ground_truth = get_ground_truth('../../data/VOC2007/ImageSets/Layout/val.txt')
-
+def seperate(ground_truth):
     # Formats data
     # truth = name of object
     # gt_box = coordinates of bounding box
@@ -168,17 +168,77 @@ if __name__ == '__main__':
                 temp_gt_box.append(j)
         truth.append(temp_truth)
         gt_box.append(temp_gt_box)
+    return truth, gt_box
 
-    # Load model and performs predictions
+def ap_iou_preprocess(classname, ground_truth, predictions):
+    '''
+    classname = name of the object to get iou and calculate average precision (one string)
+    ground_truth = ground truth (tuple, containing list of label and bounding box)
+    predictions = predictions (list of lists with format [label, xxx, bounding box coordinates])
+    '''
+    # Process predictions to be passed on to perform iou and calculation of average precision
+    predict = []
+    for prediction in predictions:
+        if prediction[0] == classname:
+            current_class.append(prediction)
+
+    truth = []
+    for i in ground_truth:
+        if i[0] == classname:
+            truth.append(i)
+
+    # for i in range(len())
+
+# DONT USE
+def conform(truth, predictions):
+    # Make number of predictions same as ground truth
+    for i in range(len(truth)):
+        predictions[i].sort(key=lambda x: x[1], reverse = True)
+        if len(predictions[i]) > len(truth[i]):
+            number_to_del = len(predictions[i]) - len(truth[i])
+            del predictions[i][number_to_del:]
+        elif len(truth[i]) > len(predictions[i]):
+            predictions[i].append(['dog',0,0,0,0,0])
+
+    predict_label = []
+    predict_box = []
+    for i in range(len(predictions)):
+        temp_predict_label = []
+        temp_predict_box = []
+        for j in range(len(predictions[i])):
+            temp_predict_label.append(predictions[i][j][0])
+            temp_predict_box.append(predictions[i][j][2:])
+        predict_label.append(temp_predict_label)
+        predict_box.append(temp_predict_box)
+    return predict_label, predict_box
+
+if __name__ == '__main__':
+    # Get images to validate on
+    imagenames, ground_truth = get_ground_truth('../../data/VOC2007/ImageSets/Layout/val.txt')
+    # Works
+
+    # Seperate boudning box from label of ground truth
+    # truth, gt_box = seperate(ground_truth)
+    # Works
+
+    # Load model
     model, bboxutil, voc_classes = load_model()
+    # Works
+
+    # Perform prediction
     images, results= validates_images(imagenames, model, bboxutil)
+    # Works
 
-    # Removes unecessary predicitons
+    # Get bounding box and label of predictions
     predictions = process_images(images, results, voc_classes)
+    # Works
 
-    
+    ap_iou_preprocess(classname, ground_truth, predictions)
+
+    # Perform IOU
     iou = bb_intersection_over_union(gt_box, predict_box)
 
+    # Perform average precision calculations
     ap = metrics.mapk(truth, predict_label, 328) #may need to minus 1
     print('IoU: {}\nAP: {}'.format(iou, ap))
 

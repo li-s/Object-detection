@@ -3,6 +3,8 @@ import os
 import pickle
 import numpy as np
 
+import test
+
 def parse_rec(filename):
     """ Parse a PASCAL VOC xml file """
     tree = ET.parse(filename)
@@ -103,11 +105,11 @@ def voc_eval(detpath,
                 print ('Reading annotation for {:d}/{:d}'.format(i + 1, len(imagenames)))
         # save
         print ('Saving cached annotations to {:s}'.format(cachefile))
-        with open(cachefile, 'w') as f:
+        with open(cachefile, 'wb') as f:
             pickle.dump(recs, f)
     else:
         # load
-        with open(cachefile, 'r') as f:
+        with open(cachefile, 'rb') as f:
             recs = pickle.load(f)
 
     # extract gt objects for this class
@@ -191,4 +193,9 @@ def voc_eval(detpath,
     return rec, prec, ap
 
 if __name__ == '__main__':
-    voc_eval(detpath, annopath, '../../data/VOC2007/ImageSets/Layout/val.txt', classname, cachedir)
+    voc_classes = ['Aeroplane', 'Bicycle', 'Bird', 'Boat', 'Bottle',
+                   'Bus', 'Car', 'Cat', 'Chair', 'Cow', 'Diningtable',
+                   'Dog', 'Horse','Motorbike', 'Person', 'Pottedplant',
+                   'Sheep', 'Sofa', 'Train', 'Tvmonitor']
+
+    voc_eval('../../data/usethis.txt', '../../data/VOC2007/Annotations/000005.xml', '../../data/VOC2007/ImageSets/Layout/val.txt', 'chair', 'cache')
